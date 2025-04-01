@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { log } from './loggingService';
 
 // Cloud provider types and interfaces
 export type CloudProvider = 'aws' | 'azure' | 'gcp';
@@ -216,6 +217,72 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
       timestamp: Date.now(),
     };
     
+    // Log important provider changes
+    if (newAws.status !== providers.aws.status) {
+      log.info(
+        `AWS status changed from ${providers.aws.status} to ${newAws.status}`, 
+        'api', 
+        { 
+          responseTime: newAws.responseTime,
+          errorRate: newAws.errorRate,
+          trafficPercentage: newAws.trafficPercentage
+        },
+        'aws'
+      );
+    }
+    
+    if (newAzure.status !== providers.azure.status) {
+      log.info(
+        `Azure status changed from ${providers.azure.status} to ${newAzure.status}`, 
+        'api', 
+        { 
+          responseTime: newAzure.responseTime,
+          errorRate: newAzure.errorRate, 
+          trafficPercentage: newAzure.trafficPercentage
+        },
+        'azure'
+      );
+    }
+    
+    if (newGcp.status !== providers.gcp.status) {
+      log.info(
+        `GCP status changed from ${providers.gcp.status} to ${newGcp.status}`, 
+        'api', 
+        {
+          responseTime: newGcp.responseTime,
+          errorRate: newGcp.errorRate,
+          trafficPercentage: newGcp.trafficPercentage
+        },
+        'gcp'
+      );
+    }
+    
+    // Log significant traffic shifts (more than 10%)
+    const trafficShift = {
+      aws: Math.abs(newAws.trafficPercentage - providers.aws.trafficPercentage),
+      azure: Math.abs(newAzure.trafficPercentage - providers.azure.trafficPercentage),
+      gcp: Math.abs(newGcp.trafficPercentage - providers.gcp.trafficPercentage),
+    };
+    
+    if (Object.values(trafficShift).some(shift => shift > 10)) {
+      log.info(
+        'Significant traffic redistribution detected', 
+        'routing', 
+        {
+          previous: {
+            aws: providers.aws.trafficPercentage,
+            azure: providers.azure.trafficPercentage,
+            gcp: providers.gcp.trafficPercentage
+          },
+          current: {
+            aws: newAws.trafficPercentage,
+            azure: newAzure.trafficPercentage,
+            gcp: newGcp.trafficPercentage
+          }
+        }
+      );
+    }
+    
     // Update state with new metrics and history
     set({
       providers: updatedProviders,
@@ -249,6 +316,18 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
       updatedProviders.azure.trafficPercentage = trafficDistribution.azure;
       updatedProviders.gcp.trafficPercentage = trafficDistribution.gcp;
       
+      // Log degradation event
+      log.warning(
+        `${provider.toUpperCase()} provider manually degraded by user`, 
+        'api', 
+        {
+          responseTime: updatedProviders[provider].responseTime,
+          errorRate: updatedProviders[provider].errorRate,
+          status: 'critical'
+        },
+        provider
+      );
+      
       set({
         providers: updatedProviders,
         history: updateHistory(updatedProviders),
@@ -275,6 +354,18 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
       updatedProviders.azure.trafficPercentage = trafficDistribution.azure;
       updatedProviders.gcp.trafficPercentage = trafficDistribution.gcp;
       
+      // Log improvement event
+      log.info(
+        `${provider.toUpperCase()} provider manually improved by user`, 
+        'api', 
+        {
+          responseTime: updatedProviders[provider].responseTime,
+          errorRate: updatedProviders[provider].errorRate,
+          status: 'healthy'
+        },
+        provider
+      );
+      
       set({
         providers: updatedProviders,
         history: updateHistory(updatedProviders),
@@ -286,6 +377,7 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
         window.clearInterval(simulationInterval);
       }
       
+      log.info('Simulation started', 'api');
       simulationInterval = window.setInterval(simulationTick, 1500);
       
       set({ isSimulationRunning: true });
@@ -297,10 +389,14 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
         simulationInterval = null;
       }
       
+      log.info('Simulation stopped', 'api');
       set({ isSimulationRunning: false });
     },
     
     setSelectedProvider: (provider) => {
+      if (provider) {
+        log.debug(`Provider ${provider} selected by user`, 'frontend');
+      }
       set({ selectedProvider: provider });
     },
   };

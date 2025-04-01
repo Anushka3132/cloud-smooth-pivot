@@ -1,9 +1,9 @@
-
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApiSimulation, CloudProvider } from '@/services/apiSimulationService';
+import { log } from '@/services/loggingService';
 import CloudProviderCard from '@/components/CloudProviderCard';
 import StatusIndicator from '@/components/StatusIndicator';
 import TrafficDistributionChart from '@/components/TrafficDistributionChart';
@@ -39,6 +39,8 @@ const Index = () => {
       description: "The simulation is now running. You can pause it or simulate failures to see how the AI adapts routing.",
     });
     
+    log.info('Application initialized', 'frontend');
+    
     // Clean up when component unmounts
     return () => {
       stopSimulation();
@@ -52,10 +54,14 @@ const Index = () => {
         description: "Please select a cloud provider first.",
         variant: "destructive",
       });
+      
+      log.warning('User attempted to degrade provider without selection', 'frontend');
       return;
     }
     
     degradeProvider(selectedProvider);
+    log.info(`User triggered provider degradation for ${selectedProvider}`, 'frontend');
+    
     toast({
       title: "Provider Degraded",
       description: `${selectedProvider.toUpperCase()} performance has been degraded. Watch the AI reroute traffic.`,
@@ -70,10 +76,14 @@ const Index = () => {
         description: "Please select a cloud provider first.",
         variant: "destructive",
       });
+      
+      log.warning('User attempted to improve provider without selection', 'frontend');
       return;
     }
     
     improveProvider(selectedProvider);
+    log.info(`User triggered provider improvement for ${selectedProvider}`, 'frontend');
+    
     toast({
       title: "Provider Recovered",
       description: `${selectedProvider.toUpperCase()} performance has been restored. Watch the AI adjust the traffic.`,
@@ -83,17 +93,25 @@ const Index = () => {
   const toggleSimulation = () => {
     if (isSimulationRunning) {
       stopSimulation();
+      log.info('User paused the simulation', 'frontend');
+      
       toast({
         title: "Simulation Paused",
         description: "The traffic routing simulation is now paused.",
       });
     } else {
       startSimulation();
+      log.info('User started the simulation', 'frontend');
+      
       toast({
         title: "Simulation Running",
         description: "The traffic routing simulation is now running.",
       });
     }
+  };
+
+  const handleTabChange = (value: string) => {
+    log.debug(`User switched to ${value} tab`, 'frontend');
   };
 
   return (
@@ -180,7 +198,7 @@ const Index = () => {
         </div>
         
         {/* Tabbed Interface for Detailed Analytics */}
-        <Tabs defaultValue="overview" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-4" onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-4 md:w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="comparison">Provider Comparison</TabsTrigger>
