@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { log } from './loggingService';
 import { CloudProvider, CloudProviderState, MetricsHistory } from './types/cloudProviderTypes';
 import { determineStatus, calculateTrafficDistribution } from './utils/cloudProviderUtils';
+import { checkErrorRateAlerts } from './utils/alertUtils';
 import { initialProviders, initializeHistory } from './state/initialCloudState';
 import { 
   simulateMetricsChanges, 
@@ -73,6 +74,9 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
       updatedProviders.aws.trafficPercentage = trafficDistribution.aws;
       updatedProviders.azure.trafficPercentage = trafficDistribution.azure;
       updatedProviders.gcp.trafficPercentage = trafficDistribution.gcp;
+      
+      // Check for error rate alerts after degradation
+      checkErrorRateAlerts(updatedProviders);
       
       // Log degradation event
       log.warning(

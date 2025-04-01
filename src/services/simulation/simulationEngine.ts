@@ -1,6 +1,7 @@
 
 import { CloudProviderState } from '../types/cloudProviderTypes';
 import { determineStatus, calculateTrafficDistribution } from '../utils/cloudProviderUtils';
+import { checkErrorRateAlerts } from '../utils/alertUtils';
 import { log } from '../loggingService';
 
 // Generate random fluctuations in metrics
@@ -66,6 +67,9 @@ export const updateTrafficAndRequests = (providers: CloudProviderState): CloudPr
     Math.floor(newRequests * (updatedProviders.azure.trafficPercentage / 100));
   updatedProviders.gcp.requestCount = providers.gcp.requestCount + 
     Math.floor(newRequests * (updatedProviders.gcp.trafficPercentage / 100));
+  
+  // Check for error rate alerts
+  checkErrorRateAlerts(updatedProviders);
   
   return {
     ...updatedProviders,
