@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CloudProviderState } from '@/services/types/cloudProviderTypes';
+import { CloudProviderState, CloudProvider } from '@/services/types/cloudProviderTypes';
 import { ActivitySquare, Cpu, Clock, CloudOff } from 'lucide-react';
 import ErrorRateAlert from './ErrorRateAlert';
 
@@ -40,19 +40,17 @@ const MetricsOverview: React.FC<MetricsOverviewProps> = ({ providers }) => {
     providers.aws.errorRate >= ERROR_RATE_THRESHOLD ? 'aws' : null,
     providers.azure.errorRate >= ERROR_RATE_THRESHOLD ? 'azure' : null,
     providers.gcp.errorRate >= ERROR_RATE_THRESHOLD ? 'gcp' : null,
-  ].filter(Boolean);
+  ].filter(Boolean) as CloudProvider[]; // Add explicit type casting here
   
   return (
     <>
       {/* Display error rate alerts if any provider exceeds the threshold */}
       {highErrorRateProviders.map((provider) => (
-        provider && (
-          <ErrorRateAlert 
-            key={provider} 
-            provider={provider} 
-            errorRate={providers[provider].errorRate} 
-          />
-        )
+        <ErrorRateAlert 
+          key={provider} 
+          provider={provider} 
+          errorRate={providers[provider].errorRate} 
+        />
       ))}
     
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
