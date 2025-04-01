@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { log } from './loggingService';
 import { CloudProvider, CloudProviderState, MetricsHistory } from './types/cloudProviderTypes';
@@ -101,10 +100,14 @@ export const useApiSimulation = create<ApiSimulationState>((set, get) => {
       const updatedProviders = { ...providers };
       
       // Improve the selected provider back to good metrics
+      // For GCP, we'll give even better error rates
+      const errorRateImprovement = provider === 'gcp' ? 0.2 : 0.15;
+      const minErrorRate = provider === 'gcp' ? 0.005 : 0.01;
+      
       updatedProviders[provider] = {
         ...updatedProviders[provider],
         responseTime: Math.max(70, updatedProviders[provider].responseTime - 200),
-        errorRate: Math.max(0.01, updatedProviders[provider].errorRate - 0.15),
+        errorRate: Math.max(minErrorRate, updatedProviders[provider].errorRate - errorRateImprovement),
         status: 'healthy',
       };
       

@@ -24,11 +24,13 @@ export const simulateMetricsChanges = (providers: CloudProviderState): CloudProv
     availabilityPercent: Math.min(100, Math.max(95, providers.azure.availabilityPercent + randomChange(-0.05, 0.05))),
   };
   
+  // GCP with improved error rate - reduce the base error rate and the random fluctuation range
   const newGcp = {
     ...providers.gcp,
     responseTime: Math.max(20, providers.gcp.responseTime + randomChange(-5, 5)),
-    errorRate: Math.max(0.001, Math.min(0.1, providers.gcp.errorRate + randomChange(-0.002, 0.002))),
-    availabilityPercent: Math.min(100, Math.max(95, providers.gcp.availabilityPercent + randomChange(-0.05, 0.05))),
+    // Reduced error rate fluctuation and base value for GCP
+    errorRate: Math.max(0.0005, Math.min(0.05, providers.gcp.errorRate * 0.92 + randomChange(-0.001, 0.001))),
+    availabilityPercent: Math.min(100, Math.max(96, providers.gcp.availabilityPercent + randomChange(-0.03, 0.07))),
   };
   
   // Update status based on new response times
