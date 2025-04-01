@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CloudProviderState } from '@/services/apiSimulationService';
+import { CloudProviderState } from '@/services/types/cloudProviderTypes';
 import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';

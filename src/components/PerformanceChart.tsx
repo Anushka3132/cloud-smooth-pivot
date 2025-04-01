@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MetricsHistory, CloudProvider } from '@/services/apiSimulationService';
+import { MetricsHistory, CloudProvider } from '@/services/types/cloudProviderTypes';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface PerformanceChartProps {

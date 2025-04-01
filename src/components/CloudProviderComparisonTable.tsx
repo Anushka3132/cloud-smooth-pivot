@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CloudProviderState, CloudProvider } from '@/services/apiSimulationService';
+import { CloudProviderState, CloudProvider } from '@/services/types/cloudProviderTypes';
 import { CheckCircle2, XCircle, AlertTriangle, Cpu, Clock, DollarSign, HelpCircle, Activity } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 

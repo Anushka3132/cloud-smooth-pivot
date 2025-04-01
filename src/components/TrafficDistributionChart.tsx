@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CloudProviderState, CloudProvider } from '@/services/apiSimulationService';
+import { CloudProviderState, CloudProvider } from '@/services/types/cloudProviderTypes';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface TrafficDistributionChartProps {

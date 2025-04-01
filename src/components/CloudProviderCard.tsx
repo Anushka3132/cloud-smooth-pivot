@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ProviderMetrics, CloudProvider } from '@/services/apiSimulationService';
+import { ProviderMetrics, CloudProvider } from '@/services/types/cloudProviderTypes';
 import StatusIndicator from './StatusIndicator';
 import { cn } from '@/lib/utils';
 import { ArrowUpRight, Clock, CloudOff, CloudRain, Gauge } from 'lucide-react';
