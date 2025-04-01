@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApiSimulation, CloudProvider } from '@/services/apiSimulationService';
 import CloudProviderCard from '@/components/CloudProviderCard';
 import StatusIndicator from '@/components/StatusIndicator';
@@ -9,7 +10,10 @@ import TrafficDistributionChart from '@/components/TrafficDistributionChart';
 import PerformanceChart from '@/components/PerformanceChart';
 import NetworkVisualizer from '@/components/NetworkVisualizer';
 import MetricsOverview from '@/components/MetricsOverview';
-import { Play, Pause, AlertTriangle, Zap, Info } from 'lucide-react';
+import CloudProviderComparisonTable from '@/components/CloudProviderComparisonTable';
+import CostAnalysisChart from '@/components/CostAnalysisChart';
+import ReliabilityMetricsCard from '@/components/ReliabilityMetricsCard';
+import { Play, Pause, AlertTriangle, Zap, Info, BarChart3, LineChart } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
@@ -175,26 +179,65 @@ const Index = () => {
           </Button>
         </div>
         
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <TrafficDistributionChart providers={providers} />
-          <NetworkVisualizer providers={providers} />
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <PerformanceChart 
-            history={history}
-            metric="responseTime"
-            title="Response Time History"
-            yAxisLabel="Time (ms)"
-          />
-          <PerformanceChart 
-            history={history}
-            metric="trafficPercentage" 
-            title="Traffic Distribution History"
-            yAxisLabel="Traffic (%)"
-          />
-        </div>
+        {/* Tabbed Interface for Detailed Analytics */}
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 md:w-auto">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="comparison">Provider Comparison</TabsTrigger>
+            <TabsTrigger value="cost">Cost Analysis</TabsTrigger>
+            <TabsTrigger value="history">Historical Data</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <TrafficDistributionChart providers={providers} />
+              <NetworkVisualizer providers={providers} />
+            </div>
+            
+            <ReliabilityMetricsCard providers={providers} />
+          </TabsContent>
+          
+          <TabsContent value="comparison">
+            <div className="space-y-4">
+              <CloudProviderComparisonTable providers={providers} />
+              <p className="text-sm text-muted-foreground">
+                This detailed comparison highlights the strengths and weaknesses of each cloud provider based on real-time metrics.
+                The AI routing algorithm uses this data to optimize traffic distribution.
+              </p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="cost">
+            <div className="space-y-4">
+              <CostAnalysisChart providers={providers} />
+              <p className="text-sm text-muted-foreground">
+                The cost analysis shows the financial impact of the current traffic distribution.
+                The AI balances cost against performance and reliability when making routing decisions.
+              </p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="history" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <PerformanceChart 
+                history={history}
+                metric="responseTime"
+                title="Response Time History"
+                yAxisLabel="Time (ms)"
+              />
+              <PerformanceChart 
+                history={history}
+                metric="trafficPercentage" 
+                title="Traffic Distribution History"
+                yAxisLabel="Traffic (%)"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Historical data shows how the AI has adapted to changing conditions over time,
+              optimizing for performance and reliability across all cloud providers.
+            </p>
+          </TabsContent>
+        </Tabs>
         
         {/* Explanation */}
         <div className="bg-accent p-4 rounded-lg border mt-6">
